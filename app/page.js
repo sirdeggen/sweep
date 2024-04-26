@@ -1,3 +1,4 @@
+'use client'
 import { useState } from 'react'
 import { PrivateKey, Transaction, ARC, P2PKH } from '@bsv/sdk'
 import { PaymailClient } from '@bsv/paymail'
@@ -17,7 +18,7 @@ class WocClient {
         return await (await fetch(this.api + route, {
             method: 'GET',
             headers: {
-                'Accept': 'applicatoin/json',
+                'Accept': 'application/json',
                 "Authorization": 'Bearer ' + this.key
             },
         })).json()
@@ -28,7 +29,7 @@ class WocClient {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'applicatoin/json',
+                'Accept': 'application/json',
                 "Authorization": 'Bearer ' + this.key
             },
             body: JSON.stringify(body)
@@ -59,7 +60,8 @@ export default function Home() {
 
     const checkPaymail = async (p) => {
         try {
-            const pki = '12' // await pmc.getPki(p)
+            const pki = await pmc.getPki(p)
+            console.log({ pki })
             setPaymail(p)
         } catch (error) {
             setError(String(error))
@@ -107,11 +109,13 @@ export default function Home() {
         }
     }
 
+    console.log({ error, paymail, wif, txid })
+
     if (error !== '') return <>
         <p>{error}</p>
     </>
 
-    if (paymail === '') return <>
+    if (paymail === '' || paymail === undefined) return <>
         <p>1. Set your destination Paymail</p>
         <input type='text' onChange={e => setInputPaymail(e.value)}/>
         <button idx={inputPaymail} onClick={() => checkPaymail(inputPaymail)} />
