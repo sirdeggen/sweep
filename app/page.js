@@ -1,6 +1,6 @@
 'use client'
 import { useState, useRef } from 'react'
-import { PrivateKey, Transaction, ARC, P2PKH } from '@bsv/sdk'
+import { PrivateKey, Transaction, ARC, P2PKH, Script } from '@bsv/sdk'
 
 const arc = new ARC('https://arc.taal.com', process.env.API_KEY)
 
@@ -46,12 +46,13 @@ class WocClient {
 
     async getUtxos(address) {
         console.log({ getUtxo: address })
-        const confirmed = await this.getJson(`/address/${address}/unconfirmed/unspent`)
+        const confirmed = await this.getJson(`/address/${address}/confirmed/unspent`)
         const unconfirmed = await this.getJson(`/address/${address}/unconfirmed/unspent`)
         const combined = []
         confirmed?.result?.map(utxo => combined.push(utxo))
         unconfirmed?.result?.map(utxo => combined.push(utxo))
-        const formatted = combined.map(u => ({ txid: u.tx_hash, vout: u.tx_pos, satoshis: u.value, script: u.hex }))
+        const script = confirmed.script ?? ''
+        const formatted = combined.map(u => ({ txid: u.tx_hash, vout: u.tx_pos, satoshis: u.value, script }))
         console.log({ confirmed, unconfirmed, combined, formatted })
         return formatted
     }
@@ -66,7 +67,7 @@ class WocClient {
 }
 
 const post = async body => {
-    return (await fetch('/api', {
+    return await (await fetch('/api', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -105,7 +106,8 @@ export default function Home() {
             const privKey = PrivateKey.fromWif(w)
             const address = privKey.toAddress()
             const utxos = await wc.getUtxos(address)
-            const satoshis = utxos.reduce((a, b) => a + b.satoshis, 0)
+            console.log({ utxos })
+            const satoshis = utxos.reduce((a, b) => a + b.satoshis, 0) - 10
             setSats(satoshis)
             console.log({ satoshis })
 
@@ -124,26 +126,25 @@ export default function Home() {
                 console.log({ rawtx })
                 const sourceTransaction = Transaction.fromHex(rawtx)
                 tx.addInput({ sourceTransaction, sourceOutputIndex, unlockingScriptTemplate: template.unlock(privKey) })
+                return true
             }))
             
             // gets a merkle path for each (later)
             
             // builds a new tx paying to a paymail as specified using a paymail client
-            outputs.map(output => tx.addOutput({ change: true, lockingScript: Script.fromHex(output.script) }))
+            outputs.map(output => tx.addOutput({ satoshis: output.satoshis, lockingScript: Script.fromHex(output.script) }))
 
-            await tx.fee()
             await tx.sign()
 
-            console.log('stopping', tx.toHexEF())
-            return tx.id('hex')
+            console.log('tx', tx.toHex())
             // sends that transaction to the paymail recipient
-            const response = await post({ paymail, method: 'send', data: { hex: tx.toHex(), reference: outputsResponse?.reference }})
+            const response = await post({ paymail, method: 'send', data: { hex: tx.toHexEF(), reference: outputsResponse?.reference }})
             console.log({ response })
             if (!!response.error) throw response.error
 
 
             // responds with txid
-            return response.txid
+            setTxid(tx.id('hex'))
         } catch (error) {
             console.log({ error })
             setError(JSON.stringify(error ?? {}))

@@ -1,4 +1,6 @@
 import { PaymailClient } from '@bsv/paymail'
+import { PrivateKey } from '@bsv/sdk'
+const routes = [publicProfileRoute, pkiRoute, p2pDestinationsRoute, receiveTransactionRoute]
 
 const pmc = new PaymailClient()
 
@@ -8,13 +10,22 @@ export async function POST(req) {
         const { paymail, method, data } = body
         console.log({ paymail, method, data })
         
+        const pk = PrivateKey.fromRandom()
+        const publicKey = pk.toPublicKey()
+        const metadata = {
+            sender: 'sweep@sweep.xn--nda.network',
+            pubkey: publicKey.toString(),
+            signature: client.createP2PSignature(tx.id('hex'), pk),
+            note: 'hello world'
+        }
+        
         let response
         switch (method) {
             case 'outputs':
                 response = await pmc.getP2pPaymentDestination(paymail, data.satoshis)
                 break
             case 'send':
-                response = await pmc.sendTransactionP2P(paymail, data.hex, data.reference)
+                response = await pmc.sendTransactionP2P(paymail, data.hex, data.reference, metadata)
                 break
             case 'pki':
             default:
