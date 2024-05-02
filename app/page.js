@@ -138,10 +138,9 @@ export default function Home() {
 
             console.log('tx', tx.toHex())
             // sends that transaction to the paymail recipient
-            const response = await post({ paymail, method: 'send', data: { hex: tx.toHexEF(), reference: outputsResponse?.reference }})
+            const response = await post({ paymail, method: 'send', data: { hex: tx.toHex(), reference: outputsResponse?.reference }})
             console.log({ response })
             if (!!response.error) throw response.error
-
 
             // responds with txid
             setTxid(tx.id('hex'))
