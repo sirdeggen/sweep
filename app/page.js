@@ -81,7 +81,6 @@ const wc = new WocClient()
 
 export default function Home() {
     const [error, setError] = useState('')
-    const [inputPaymail, setInputPaymail] = useState('')
     const [paymail, setPaymail] = useState('')
     const [wif, setWif] = useState('')
     const [sats, setSats] = useState(0)
@@ -102,6 +101,7 @@ export default function Home() {
     const sweepFunds = async () => {
         try {
             const w = wifInput?.current?.value
+            setWif(wif)
             // app requests utxos at a specific address
             const privKey = PrivateKey.fromWif(w)
             const address = privKey.toAddress()
@@ -143,7 +143,7 @@ export default function Home() {
             if (!!response.error) throw response.error
 
             // responds with txid
-            setTxid(tx.id('hex'))
+            setTxid(response.txid)
         } catch (error) {
             console.log({ error })
             setError(JSON.stringify(error ?? {}))
