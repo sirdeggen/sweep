@@ -191,7 +191,7 @@ export default function Home() {
 
     if (txid === '') return <>
         <p>1. All funds will be swept to {paymail} ✅</p>
-        <p>2. Private Key associated with {wif.toAddress()} will be used to sign transaction ✅</p>
+        <p>2. {wif} will be used to sign transaction ✅</p>
         <p>3. Sweeping...</p>
     </>
 
