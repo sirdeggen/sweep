@@ -14,7 +14,7 @@ export async function POST(req) {
         const metadata = {
             sender: 'sweep@sweep.xn--nda.network',
             pubkey: publicKey.toString(),
-            signature: client.createP2PSignature(tx.id('hex'), pk),
+            signature: pmc.createP2PSignature(tx.id('hex'), pk),
             note: 'hello world'
         }
         
