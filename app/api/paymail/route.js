@@ -1,7 +1,7 @@
-import { PaymailRouter, pkiRoute, publicProfileRoute, RequestSenderValidationCapability } from '@bsv/paymail'
+import { PaymailRouter, PublicKeyInfrastructureRoute, PublicProfileRoute, RequestSenderValidationCapability } from '@bsv/paymail'
 import { NextResponse } from 'next/server'
 
-const routes = [pkiRoute, publicProfileRoute]
+const routes = [PublicKeyInfrastructureRoute, PublicProfileRoute]
 const s = new PaymailRouter({
     baseUrl: 'https://sweep.xn--nda.network',
     basePath: '/api/paymail',
