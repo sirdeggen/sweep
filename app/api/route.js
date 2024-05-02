@@ -1,6 +1,5 @@
 import { PaymailClient } from '@bsv/paymail'
 import { PrivateKey } from '@bsv/sdk'
-const routes = [publicProfileRoute, pkiRoute, p2pDestinationsRoute, receiveTransactionRoute]
 
 const pmc = new PaymailClient()
 
