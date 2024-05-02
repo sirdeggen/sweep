@@ -191,7 +191,7 @@ export default function Home() {
 
     if (txid === '') return <>
         <p>1. All funds will be swept to {paymail} ✅</p>
-        <p>2. {wif} will be used to sign transaction ✅</p>
+        <p>2. Private Key associated with {wif.toAddress()} will be used to sign transaction ✅</p>
         <p>3. Sweeping...</p>
     </>
 
@@ -199,5 +199,6 @@ export default function Home() {
         <p>1. All funds will be swept to {paymail} ✅</p>
         <p>2. {wif} will be used to sign transaction ✅</p>
         <p>3. Swept {sats.toLocaleString(['en'], { maximumFractionDigits: 0, minimumFractionDigits: 0 })} satoshis ✅</p>
+        <p>4. Check transaction status: <a target="_BLANK" href={`https://whatsonchain.com/tx/${txid}`}>{txid}</a></p>
     </>
 }
