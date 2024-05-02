@@ -10,7 +10,7 @@ const s = new PaymailRouter({
 
 export async function POST(req) {
     const capabilities = routes.reduce((map, route) => {
-        const endpoint = route.getEndpoint().replace(/:paymail/g, '{alias}@{domain.tld}').replace(/:pubkey/g, '{pubkey}')
+        const endpoint = route.endpoint.replace(/:paymail/g, '{alias}@{domain.tld}').replace(/:pubkey/g, '{pubkey}')
         map[route.getCode()] = this.joinUrl(this.baseUrl, this.getBasePath(), endpoint)
         return map
       }, {})
