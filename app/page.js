@@ -81,7 +81,7 @@ const wc = new WocClient()
 
 export default function Home() {
     const [error, setError] = useState('')
-    const [paymail, setPaymail] = useState('')
+const [paymail, setPaymail] = useState('')
     const [wif, setWif] = useState('')
     const [sats, setSats] = useState(0)
     const [txid, setTxid] = useState('')
@@ -149,6 +149,8 @@ export default function Home() {
             setError(JSON.stringify(error ?? {}))
         }
     }
+
+    // deploy
 
     const paymailInput = useRef()
     const wifInput = useRef()
