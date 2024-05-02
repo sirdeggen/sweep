@@ -91,7 +91,7 @@ const wc = new WocClient()
 
 export default function Home() {
     const [error, setError] = useState('')
-const [paymail, setPaymail] = useState('')
+    const [paymail, setPaymail] = useState('')
     const [wif, setWif] = useState('')
     const [sats, setSats] = useState(0)
     const [txid, setTxid] = useState('')
@@ -111,7 +111,7 @@ const [paymail, setPaymail] = useState('')
     const sweepFunds = async () => {
         try {
             const w = wifInput?.current?.value
-            setWif(wif)
+            setWif(w)
             // app requests utxos at a specific address
             const privKey = PrivateKey.fromWif(w)
             const address = privKey.toAddress()
