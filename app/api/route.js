@@ -1,5 +1,5 @@
 import { PaymailClient } from '@bsv/paymail'
-import { PrivateKey } from '@bsv/sdk'
+import { PrivateKey, Transaction } from '@bsv/sdk'
 
 const pmc = new PaymailClient()
 
@@ -9,8 +9,9 @@ export async function POST(req) {
         const { paymail, method, data } = body
         console.log({ paymail, method, data })
         
-        const pk = PrivateKey.fromRandom()
+        const pk = PrivateKey.fromWif('L3PVGoUsQ1PEk2ydHA39qSKndSw92RBHommq283tDvatogHZwJHR')
         const publicKey = pk.toPublicKey()
+        const tx = Transaction.fromHex(data.hex)
         const metadata = {
             sender: 'sweep@sweep.xn--nda.network',
             pubkey: publicKey.toString(),
