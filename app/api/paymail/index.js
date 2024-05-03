@@ -32,7 +32,7 @@ const routes = [
 ];
 const s = new PaymailRouter({
   baseUrl: "https://sweep.xn--nda.network",
-  basePath: "/api/paymail",
+  basePath: "/paymail",
   routes,
 });
 
@@ -46,3 +46,7 @@ const path = require("path");
 
 app.use(express.static("public"));
 app.use(paymailRouter.getRouter());
+
+app.listen(3000, () => console.log('Server ready on port 3000.'));
+
+module.exports = app;
