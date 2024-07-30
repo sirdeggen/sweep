@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@bsv/paymail": "^0.3.0",
+    "@bsv/paymail": "^1.0.1",
     "@bsv/sdk": "^1.0.19",
     "next": "14.2.2",
     "react": "^18",
