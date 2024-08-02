@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { PrivateKey } from '@bsv/sdk'
 
 
 const key = PrivateKey.fromWif(process.env.WIF)
