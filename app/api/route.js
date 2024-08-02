@@ -3,19 +3,21 @@ import { PrivateKey, Transaction } from '@bsv/sdk'
 
 const pmc = new PaymailClient()
 
+
+const key = PrivateKey.fromWif(process.env.WIF)
+const pubkey = key.toPublicKey().toString()
+
 export async function POST(req) {
     try {
         const body = await req.json()
         const { paymail, method, data } = body
         console.log({ paymail, method, data })
         
-        const pk = PrivateKey.fromWif('L3PVGoUsQ1PEk2ydHA39qSKndSw92RBHommq283tDvatogHZwJHR')
-        const publicKey = pk.toPublicKey()
         const tx = Transaction.fromHex(data.hex)
         const metadata = {
             sender: 'sweep@sweep.xn--nda.network',
-            pubkey: publicKey.toString(),
-            signature: pmc.createP2PSignature(tx.id('hex'), pk),
+            pubkey,
+            signature: pmc.createP2PSignature(tx.id('hex'), key),
             note: 'hello world'
         }
         
