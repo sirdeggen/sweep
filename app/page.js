@@ -10,7 +10,9 @@ class WocClient {
         this.api = 'https://api.whatsonchain.com/v1/bsv/main'
         this.key = process.env.API_KEY
         this.timeBetweenRequestsMs = 340
-        this.lastRequest = Date.now()
+        this.batchRequests = []
+        this.transactions = []
+        this.merklepaths = []
     }
 
     async getJson(route) {
@@ -24,11 +26,8 @@ class WocClient {
     }
 
     async get(route) {
-        const now = Date.now()
-        if (this.lastRequest + this.timeBetweenRequestsMs > now) {
-            const diff = this.lastRequest + this.timeBetweenRequestsMs - now
-            await new Promise(resolve => setTimeout(resolve, diff))
-        }
+        this.batchRequests.push(1)
+        await new Promise(resolve => setTimeout(resolve, this.batchRequests.length * this.timeBetweenRequestsMs))
         const text = await (await fetch(this.api + route, {
             method: 'GET',
             headers: {
@@ -36,16 +35,12 @@ class WocClient {
                 // "Authorization": 'Bearer ' + this.key
             },
         })).text()
-        this.lastRequest = Date.now()
         return text
     }
 
     async post(route, body) {
-        const now = Date.now()
-        if (this.lastRequest + this.timeBetweenRequestsMs > now) {
-            const diff = this.lastRequest + this.timeBetweenRequestsMs - now
-            await new Promise(resolve => setTimeout(resolve, diff))
-        }
+        this.batchRequests.push(1)
+        await new Promise(resolve => setTimeout(resolve, this.batchRequests.length * this.timeBetweenRequestsMs))
         const j = await (await fetch(this.api + route, {
             method: 'POST',
             headers: {
@@ -55,7 +50,6 @@ class WocClient {
             },
             body: JSON.stringify(body)
         })).json()
-        this.lastRequest = Date.now()
         return j
     }
 
@@ -83,11 +77,17 @@ class WocClient {
     }
 
     async getTx(txid) {
-        return this.get(`/tx/${txid}/hex`)
+        if (this.transactions[txid]) return this.transactions[txid]
+        const tx = await this.get(`/tx/${txid}/hex`)
+        this.transactions[txid] = tx
+        return tx
     }
 
     async getMerklePath(txid) {
-        return this.getJson(`/tx/${txid}/tsc`)
+        if (this.merklepaths[txid]) return this.merklepaths[txid]
+        const mp = await this.getJson(`/tx/${txid}/tsc`)
+        this.merklepaths[txid] = mp
+        return mp
     }
 }
 
