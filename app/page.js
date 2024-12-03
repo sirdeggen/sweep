@@ -9,7 +9,8 @@ class WocClient {
     constructor() {
         this.api = 'https://api.whatsonchain.com/v1/bsv/main'
         this.key = process.env.API_KEY
-        return this
+        this.timeBetweenRequestsMs = 340
+        this.lastRequest = Date.now()
     }
 
     async getJson(route) {
@@ -23,17 +24,29 @@ class WocClient {
     }
 
     async get(route) {
-        return await (await fetch(this.api + route, {
+        const now = Date.now()
+        if (this.lastRequest + this.timeBetweenRequestsMs > now) {
+            const diff = this.lastRequest + this.timeBetweenRequestsMs - now
+            await new Promise(resolve => setTimeout(resolve, diff))
+        }
+        const text = await (await fetch(this.api + route, {
             method: 'GET',
             headers: {
                 'Accept': 'plain/text',
                 // "Authorization": 'Bearer ' + this.key
             },
         })).text()
+        this.lastRequest = Date.now()
+        return text
     }
 
     async post(route, body) {
-        return await (await fetch(this.api + route, {
+        const now = Date.now()
+        if (this.lastRequest + this.timeBetweenRequestsMs > now) {
+            const diff = this.lastRequest + this.timeBetweenRequestsMs - now
+            await new Promise(resolve => setTimeout(resolve, diff))
+        }
+        const j = await (await fetch(this.api + route, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -42,6 +55,8 @@ class WocClient {
             },
             body: JSON.stringify(body)
         })).json()
+        this.lastRequest = Date.now()
+        return j
     }
 
     async getUtxos(address) {

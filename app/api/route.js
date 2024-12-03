@@ -27,6 +27,7 @@ export async function POST(req) {
                 response = await pmc.getP2pPaymentDestination(paymail, data.satoshis)
                 break
             case 'send':
+                console.log(JSON.stringify({ hex: data.hex, reference: data.reference, metadata }))
                 response = await pmc.sendTransactionP2P(paymail, data.hex, data.reference, metadata)
                 break
             case 'pki':
