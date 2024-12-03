@@ -110,9 +110,11 @@ export default function Home() {
     const [wif, setWif] = useState('')
     const [sats, setSats] = useState(0)
     const [txid, setTxid] = useState('')
+    const [loading, setLoading] = useState(false)
 
     const checkPaymail = async () => {
         try {
+            setLoading(true)
             const paymail = paymailInput?.current?.value
             const pki = await post({ paymail, method: 'pki' })
             console.log({ pki })
@@ -120,11 +122,14 @@ export default function Home() {
         } catch (error) {
             setError(String(error))
             console.log({ error })
+        } finally {
+            setLoading(false)
         }
     }
 
     const sweepFunds = async () => {
         try {
+            setLoading(true)
             const w = wifInput?.current?.value
             setWif(w)
             // app requests utxos at a specific address
@@ -132,6 +137,8 @@ export default function Home() {
             const address = privKey.toAddress()
             const utxos = await wc.getUtxos(address)
             console.log({ utxos })
+            if (utxos.length === 0) return setError('No UTXOs found under the control of that private key.')
+
             const satoshis = utxos.reduce((a, b) => a + b.satoshis, 0) - 10
             setSats(satoshis)
             console.log({ satoshis })
@@ -165,13 +172,15 @@ export default function Home() {
             // sends that transaction to the paymail recipient
             const response = await post({ paymail, method: 'send', data: { hex: tx.toHex(), reference: outputsResponse?.reference }})
             console.log({ response })
-            if (!!response.error) throw response.error
+            if (response.error) throw response.error
 
             // responds with txid
             setTxid(response.txid)
         } catch (error) {
             console.log({ error })
-            setError(JSON.stringify(error ?? {}))
+            setError(JSON.stringify(error?.message || error || {}))
+        } finally {
+            setLoading(false)
         }
     }
 
@@ -183,14 +192,12 @@ export default function Home() {
     // console.log({ error, paymail, wif, txid })
     // L3PVGoUsQ1PEk2ydHA39qSKndSw92RBHommq283tDvatogHZwJHR
 
-    if (error !== '') return <>
-        <p>{error}</p>
-    </>
+    if (error !== '') return <p>{error}</p>
 
     if (paymail === '' || paymail === undefined) return <>
         <p>1. Set your destination Paymail</p>
         <input ref={paymailInput} type='text' />
-        <button onClick={checkPaymail}>
+        <button onClick={checkPaymail} disabled={loading}>
             Validate
         </button>
     </>
@@ -199,7 +206,7 @@ export default function Home() {
         <p>1. All funds will be swept to {paymail} ✅</p>
         <p>2. Scan or enter a private key.</p>
         <input ref={wifInput} type='text' />
-        <button onClick={sweepFunds}>
+        <button onClick={sweepFunds} disabled={loading}>
             Sweep
         </button>
     </>
